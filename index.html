@@ -148,7 +148,14 @@ function startVoiceInput() {
   recognition.start();
 }
 </script>
-<script>alert("通常スクリプト動作OK");</script>
+<script>
+window.addEventListener("error", function(event) {
+  alert("JavaScriptエラー: " + event.message);
+});
+window.addEventListener("unhandledrejection", function(event) {
+  alert("通信エラー: " + String(event.reason));
+});
+</script>
 <script type="module">
 alert("Firebaseスクリプト開始");
 
