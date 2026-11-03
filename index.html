@@ -209,7 +209,7 @@ if (!roomId) {
 
   try {
 await addDoc(
-  collection(db, "users", auth.currentUser.uid, "messages"),
+  collection(db, "rooms", roomId, "messages"),
   {
     text: text,
     uid: auth.currentUser.uid,
