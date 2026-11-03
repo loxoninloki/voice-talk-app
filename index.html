@@ -93,6 +93,9 @@ function createNewRoom() {
   if (!confirmed) return;
 
   const roomId = crypto.randomUUID();
+  
+sessionStorage.setItem("room-creator-" + roomId, "pending");
+
   const url = new URL(window.location.href);
 
   url.search = "";
