@@ -190,6 +190,7 @@ signInAnonymously(auth)
   })
   .catch((error) => {
     console.error("匿名ログイン失敗:", error);
+  alert("Firebase認証エラー: " + error.code);
   });
 
 async function saveMessage(text) {
