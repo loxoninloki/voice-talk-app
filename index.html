@@ -78,10 +78,28 @@ button {
 
 <button onclick="copyInviteURL()">🔗 招待URLをコピー</button>
 
+<button onclick="createNewRoom()">＋ 新しいルームを作成</button>
+
   <p>女性音声でメッセージを読み上げます。</p>
 </main>
 
 <script>
+
+function createNewRoom() {
+  const confirmed = confirm(
+    "新しい会話ルームを作成しますか？\n現在のルームから移動します。"
+  );
+
+  if (!confirmed) return;
+
+  const roomId = crypto.randomUUID();
+  const url = new URL(window.location.href);
+
+  url.search = "";
+  url.searchParams.set("room", roomId);
+
+  window.location.href = url.toString();
+}
 
 function copyInviteURL() {
   const url = new URL(window.location.href);
