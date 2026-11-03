@@ -211,6 +211,14 @@ async function saveMessage(text) {
 
 window.saveMessageToFirebase = saveMessage;
 
+const roomId = new URLSearchParams(
+  window.location.search
+).get("room");
+
+console.log("現在のルームID:", roomId);
+
 </script>
+
+
 </body>
 </html>
