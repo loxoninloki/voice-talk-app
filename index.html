@@ -192,13 +192,17 @@ signInAnonymously(auth)
   });
 
 async function saveMessage(text) {
-  if (!auth.currentUser) {
+if (!roomId) {
+  alert("会話ルームが指定されていません");
+  return;
+}
+    if (!auth.currentUser) {
     console.error("ログインが完了していません");
     return;
   }
 
   try {
-    await addDoc(collection(db, "messages"), {
+    await addDoc(collection(db, "rooms", roomId, "messages")
       text: text,
       uid: auth.currentUser.uid,
       createdAt: serverTimestamp()
