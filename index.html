@@ -264,7 +264,13 @@ signInAnonymously(auth)
       window.location.search
     ).get("room");
 
-    if (!newRoomId || newRoomId === "test-room") return;
+   
+if (!newRoomId) return;
+
+if (newRoomId === "test-room") {
+  startMessagesListener();
+  return;
+}
 
     const roomRef = doc(db, "rooms", newRoomId);
     const creatorKey = "room-creator-" + newRoomId;
@@ -278,6 +284,9 @@ signInAnonymously(auth)
 
       sessionStorage.removeItem(creatorKey);
       console.log("ルーム作成完了");
+      
+startMessagesListener();
+
       return;
     }
 
@@ -302,6 +311,9 @@ signInAnonymously(auth)
     });
 
     console.log("ルーム参加完了");
+    
+startMessagesListener();
+
   })
   .catch((error) => {
     console.error("ルーム初期化エラー:", error);
@@ -346,7 +358,9 @@ console.log("現在のルームID:", roomId);
 
 const currentUserId = () => auth.currentUser?.uid ?? null;
 
-if (roomId) {
+
+function startMessagesListener() {
+  if (!roomId) return;
   const messagesQuery = query(
     collection(db, "rooms", roomId, "messages"),
     orderBy("createdAt", "asc")
