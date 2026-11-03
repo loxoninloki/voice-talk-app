@@ -73,6 +73,12 @@ button {
     <button onclick="send()">送信</button>
     <button onclick="startVoiceInput()">🎤</button>
   </div>
+  
+<button id="callButton" onclick="toggleCallMic()">
+  📞 通話マイクON
+</button>
+<p id="callStatus">通話マイク：OFF</p>
+
 
 <button onclick="enableVoice()">🔊 音声ON</button>
 
@@ -84,6 +90,35 @@ button {
 </main>
 
 <script>
+
+let callStream = null;
+
+async function toggleCallMic() {
+  const button = document.getElementById("callButton");
+  const status = document.getElementById("callStatus");
+
+  if (callStream) {
+    callStream.getTracks().forEach(track => track.stop());
+    callStream = null;
+    button.textContent = "📞 通話マイクON";
+    status.textContent = "通話マイク：OFF";
+    return;
+  }
+
+  try {
+    callStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false
+    });
+
+    button.textContent = "🔴 通話マイクOFF";
+    status.textContent = "マイク準備完了（接続前）";
+  } catch (error) {
+    console.error("マイクエラー:", error);
+    alert("マイクを利用できません。Safariの許可設定を確認してください。");
+  }
+}
+
 
 function createNewRoom() {
   const confirmed = confirm(
