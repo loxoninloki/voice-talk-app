@@ -325,6 +325,53 @@ function createPeerConnection() {
 console.log("WebRTC準備完了");
 
 
+async function startCall() {
+  if (!auth.currentUser || !roomId) {
+    alert("ルームへの接続が完了していません");
+    return;
+  }
+
+  if (!callStream) {
+    alert("先に通話マイクをONにしてください");
+    return;
+  }
+
+  try {
+    const pc = createPeerConnection();
+
+    callStream.getTracks().forEach((track) => {
+      pc.addTrack(track, callStream);
+    });
+
+    const callRef = doc(
+      collection(db, "rooms", roomId, "calls")
+    );
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    await setDoc(callRef, {
+      callerId: auth.currentUser.uid,
+      offer: {
+        type: offer.type,
+        sdp: offer.sdp
+      },
+      createdAt: serverTimestamp()
+    });
+
+    console.log("通話接続要求を保存:", callRef.id);
+
+    document.getElementById("callStatus").textContent =
+      "発信準備完了（相手の応答待ち）";
+
+  } catch (error) {
+    console.error("発信エラー:", error);
+    alert("発信エラー: " + error.message);
+  }
+}
+
+window.startCall = startCall;
+
 
 signInAnonymously(auth)
   .then(async (result) => {
