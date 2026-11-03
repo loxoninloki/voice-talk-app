@@ -216,7 +216,7 @@ if (!roomId) {
   }
 
   try {
-await addDoc(collection(db, "rooms", roomId, "messages"), {
+await addDoc(collection(db, "users", auth.currentUser.uid, "messages")
   text: text,
   uid: auth.currentUser.uid,
   createdAt: serverTimestamp()
