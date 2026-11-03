@@ -148,6 +148,31 @@ function startVoiceInput() {
   recognition.start();
 }
 </script>
+<script type="module">
 
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
+
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+  import { getAuth } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDuLI2RIVfEu5pkbJNgSXfHFFItc-aY7fg",
+  authDomain: "voice-talk-app-b33c2.firebaseapp.com",
+  projectId: "voice-talk-app-b33c2",
+  storageBucket: "voice-talk-app-b33c2.firebasestorage.app",
+  messagingSenderId: "1083145521643",
+  appId: "1:1083145521643:web:2266cc86edd27b3babb1ae",
+  measurementId: "G-WHS9YMF59V"
+};
+
+  const app = initializeApp(firebaseConfig);
+
+  const db = getFirestore(app);
+
+  const auth = getAuth(app);
+
+</script>
 </body>
 </html>
