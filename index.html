@@ -216,11 +216,14 @@ if (!roomId) {
   }
 
   try {
-await addDoc(collection(db, "users", auth.currentUser.uid, "messages")
-  text: text,
-  uid: auth.currentUser.uid,
-  createdAt: serverTimestamp()
-});
+await addDoc(
+  collection(db, "users", auth.currentUser.uid, "messages"),
+  {
+    text: text,
+    uid: auth.currentUser.uid,
+    createdAt: serverTimestamp()
+  }
+);
     console.log("メッセージ保存成功");
   } catch (error) {
     console.error("メッセージ保存失敗:", error);
