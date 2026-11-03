@@ -240,6 +240,9 @@ if (roomId) {
   );
 
   
+  
+  let firstLoad = true;
+
   onSnapshot(messagesQuery, (snapshot) => {
     const box = document.getElementById("messages");
     box.replaceChildren();
@@ -263,10 +266,25 @@ if (roomId) {
     });
 
     box.scrollTop = box.scrollHeight;
+
+    if (!firstLoad) {
+      snapshot.docChanges().forEach((change) => {
+        if (
+          change.type === "added" &&
+          !change.doc.metadata.hasPendingWrites &&
+          change.doc.data().uid !== currentUserId()
+        ) {
+          speak(change.doc.data().text || "");
+        }
+      });
+    }
+
+    firstLoad = false;
   }, (error) => {
     console.error("受信エラー:", error);
     alert("受信エラー: " + error.code);
   });
+
 
 }
 
