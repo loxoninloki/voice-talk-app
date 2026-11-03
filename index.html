@@ -76,10 +76,28 @@ button {
 
 <button onclick="enableVoice()">🔊 音声ON</button>
 
+<button onclick="copyInviteURL()">🔗 招待URLをコピー</button>
+
   <p>女性音声でメッセージを読み上げます。</p>
 </main>
 
 <script>
+
+function copyInviteURL() {
+  const url = new URL(window.location.href);
+
+  if (!url.searchParams.get("room")) {
+    url.searchParams.set("room", crypto.randomUUID());
+  }
+
+  navigator.clipboard.writeText(url.toString())
+    .then(() => {
+      alert("招待URLをコピーしました！");
+    })
+    .catch(() => {
+      prompt("このURLをコピーしてください", url.toString());
+    });
+}
 
 let voiceEnabled = false;
 
