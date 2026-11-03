@@ -217,6 +217,7 @@ function startVoiceInput() {
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 
 
+
 import {
   getFirestore,
   collection,
@@ -227,25 +228,48 @@ import {
   serverTimestamp,
   doc,
   setDoc
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+
+import {
+  getAuth,
+  signInAnonymously
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDuLI2RIVfEu5pkbJNgSXfHFFItc-aY7fg",
+  authDomain: "voice-talk-app-b33c2.firebaseapp.com",
+  projectId: "voice-talk-app-b33c2",
+  storageBucket: "voice-talk-app-b33c2.firebasestorage.app",
+  messagingSenderId: "1083145521643",
+  appId: "1:1083145521643:web:2266cc86edd27b3babb1ae",
+  measurementId: "G-WHS9YMF59V"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
+
+console.log("Firebase接続準備OK");
 
 signInAnonymously(auth)
   .then(async (result) => {
     console.log("匿名ログイン成功:", result.user.uid);
 
-    const roomId = new URLSearchParams(
+    const newRoomId = new URLSearchParams(
       window.location.search
     ).get("room");
 
-    if (!roomId || roomId === "test-room") return;
+    if (!newRoomId || newRoomId === "test-room") return;
 
-    const creatorKey = "room-creator-" + roomId;
+    const creatorKey = "room-creator-" + newRoomId;
 
     if (sessionStorage.getItem(creatorKey) === "pending") {
-      await setDoc(doc(db, "rooms", roomId), {
+      await setDoc(doc(db, "rooms", newRoomId), {
         ownerId: result.user.uid,
         members: [result.user.uid],
         createdAt: serverTimestamp()
       });
+
       sessionStorage.removeItem(creatorKey);
       console.log("ルーム作成者を登録しました");
     }
@@ -254,9 +278,7 @@ signInAnonymously(auth)
     console.error("初期化エラー:", error);
     alert("初期化エラー: " + error.code);
   });
-    console.error("匿名ログイン失敗:", error);
-  alert("Firebase認証エラー: " + error.code);
-  });
+
 
 async function saveMessage(text) {
 if (!roomId) {
