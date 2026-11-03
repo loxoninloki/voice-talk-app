@@ -239,15 +239,35 @@ if (roomId) {
     orderBy("createdAt", "asc")
   );
 
+  
   onSnapshot(messagesQuery, (snapshot) => {
-    console.log("受信したメッセージ数:", snapshot.size);
+    const box = document.getElementById("messages");
+    box.replaceChildren();
+
     snapshot.forEach((doc) => {
-      console.log("受信:", doc.data().text);
+      const data = doc.data();
+      const item = document.createElement("div");
+
+      item.className = "message";
+      item.textContent = data.text || "";
+
+      if (data.uid === currentUserId()) {
+        item.style.marginLeft = "20%";
+        item.style.background = "#d9c8fa";
+      } else {
+        item.style.marginRight = "20%";
+        item.style.background = "#eeeeee";
+      }
+
+      box.appendChild(item);
     });
+
+    box.scrollTop = box.scrollHeight;
   }, (error) => {
     console.error("受信エラー:", error);
     alert("受信エラー: " + error.code);
   });
+
 }
 
 </script>
