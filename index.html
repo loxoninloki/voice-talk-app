@@ -121,7 +121,7 @@ function send() {
 
   input.value = "";
   speak(message);
-}
+  window.saveMessageToFirebase?.(message);}
 function startVoiceInput() {
   const SpeechRecognition =
     window.SpeechRecognition ||
@@ -208,6 +208,8 @@ async function saveMessage(text) {
     console.error("メッセージ保存失敗:", error);
   }
 }
+
+window.saveMessageToFirebase = saveMessage;
 
 </script>
 </body>
