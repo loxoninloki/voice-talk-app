@@ -121,7 +121,7 @@ function send() {
 
   input.value = "";
   speak(message);
-alert("Firebase保存処理を呼び出します");
+
 window.saveMessageToFirebase?.(message);
 }
 
@@ -151,16 +151,8 @@ function startVoiceInput() {
   recognition.start();
 }
 </script>
-<script>
-window.addEventListener("error", function(event) {
-  alert("JavaScriptエラー: " + event.message);
-});
-window.addEventListener("unhandledrejection", function(event) {
-  alert("通信エラー: " + String(event.reason));
-});
-</script>
+
 <script type="module">
-alert("Firebaseスクリプト開始");
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 
@@ -197,7 +189,7 @@ console.log("Firebase接続準備OK");
 
 signInAnonymously(auth)
   .then((result) => {
- alert("あなたのUID: " + result.user.uid);
+
        console.log("匿名ログイン成功:", result.user.uid);
   })
   .catch((error) => {
