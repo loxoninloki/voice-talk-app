@@ -289,6 +289,38 @@ const auth = getAuth(app);
 
 console.log("Firebase接続準備OK");
 
+const rtcConfig = {
+  iceServers: [
+    {
+      urls: "stun:stun.l.google.com:19302"
+    }
+  ]
+};
+
+let peerConnection = null;
+let remoteAudioStream = null;
+
+function createPeerConnection() {
+  peerConnection = new RTCPeerConnection(rtcConfig);
+
+  peerConnection.ontrack = (event) => {
+    remoteAudioStream = event.streams[0];
+    console.log("相手の音声を受信しました");
+  };
+
+  peerConnection.onconnectionstatechange = () => {
+    console.log(
+      "通話接続状態:",
+      peerConnection.connectionState
+    );
+  };
+
+  return peerConnection;
+}
+
+console.log("WebRTC準備完了");
+
+
 
 signInAnonymously(auth)
   .then(async (result) => {
