@@ -74,10 +74,31 @@ button {
     <button onclick="startVoiceInput()">🎤</button>
   </div>
 
+<button onclick="enableVoice()">🔊 音声ON</button>
+
   <p>女性音声でメッセージを読み上げます。</p>
 </main>
 
 <script>
+
+let voiceEnabled = false;
+
+function enableVoice() {
+  if (!("speechSynthesis" in window)) {
+    alert("この端末は音声読み上げに対応していません");
+    return;
+  }
+
+  voiceEnabled = true;
+  speechSynthesis.cancel();
+
+  const test = new SpeechSynthesisUtterance(
+    "音声の準備ができました"
+  );
+  test.lang = "ja-JP";
+  speechSynthesis.speak(test);
+}
+
 function speak(message) {
   if (!("speechSynthesis" in window)) {
     alert("この端末では読み上げを利用できません");
