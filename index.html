@@ -218,6 +218,7 @@ function startVoiceInput() {
 
 
 
+
 import {
   getFirestore,
   collection,
@@ -227,7 +228,9 @@ import {
   orderBy,
   serverTimestamp,
   doc,
-  setDoc
+  setDoc,
+  getDoc,
+  runTransaction
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
 import {
