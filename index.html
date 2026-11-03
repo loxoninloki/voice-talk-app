@@ -1,1 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>音声トーク</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #f6f2ff;
+  color: #333;
+}
+header {
+  background: #a58bd4;
+  color: white;
+  padding: 20px;
+  text-align: center;
+  font-size: 22px;
+}
+main {
+  padding: 16px;
+  max-width: 600px;
+  margin: auto;
+}
+#messages {
+  height: 55vh;
+  overflow-y: auto;
+  background: white;
+  border-radius: 16px;
+  padding: 15px;
+}
+.message {
+  background: #eee5ff;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 15px;
+}
+input {
+  flex: 1;
+  min-width: 0;
+  padding: 14px;
+  border: 1px solid #ccc;
+  border-radius: 12px;
+  font-size: 16px;
+}
+button {
+  background: #9876cf;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 16px;
+}
+</style>
+</head>
+<body>
 
+<header>音声トーク</header>
+
+<main>
+  <div id="messages"></div>
+
+  <div class="controls">
+    <input id="text" placeholder="メッセージを入力">
+    <button onclick="send()">送信</button>
+  </div>
+
+  <p>女性音声でメッセージを読み上げます。</p>
+</main>
+
+<script>
+function speak(message) {
+  if (!("speechSynthesis" in window)) {
+    alert("この端末では読み上げを利用できません");
+    return;
+  }
+
+  speechSynthesis.cancel();
+
+  const voice = new SpeechSynthesisUtterance(message);
+  voice.lang = "ja-JP";
+  voice.rate = 0.9;
+
+  const voices = speechSynthesis.getVoices();
+  const japanese = voices.filter(v =>
+    v.lang.startsWith("ja")
+  );
+
+  const female = japanese.find(v =>
+    /Kyoko|Otoya|Siri|女性/i.test(v.name)
+  );
+
+  if (female) voice.voice = female;
+
+  speechSynthesis.speak(voice);
+}
+
+function send() {
+  const input = document.getElementById("text");
+  const message = input.value.trim();
+
+  if (!message) return;
+
+  const box = document.getElementById("messages");
+  const item = document.createElement("div");
+
+  item.className = "message";
+  item.textContent = message;
+
+  box.appendChild(item);
+  box.scrollTop = box.scrollHeight;
+
+  input.value = "";
+  speak(message);
+}
+</script>
+
+</body>
+</html>
