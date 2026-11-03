@@ -231,6 +231,7 @@ const roomId = new URLSearchParams(
 
 console.log("現在のルームID:", roomId);
 
+const currentUserId = () => auth.currentUser?.uid ?? null;
 </script>
 
 
