@@ -185,7 +185,8 @@ console.log("Firebase接続準備OK");
 
 signInAnonymously(auth)
   .then((result) => {
-    console.log("匿名ログイン成功:", result.user.uid);
+ alert("あなたのUID: " + result.user.uid);
+       console.log("匿名ログイン成功:", result.user.uid);
   })
   .catch((error) => {
     console.error("匿名ログイン失敗:", error);
