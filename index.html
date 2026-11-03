@@ -437,6 +437,7 @@ if (!newRoomId) return;
 
 if (newRoomId === "test-room") {
   startMessagesListener();
+  startIncomingCallListener();
   return;
 }
 
@@ -454,7 +455,7 @@ if (newRoomId === "test-room") {
       console.log("ルーム作成完了");
       
 startMessagesListener();
-
+startIncomingCallListener();
       return;
     }
 
@@ -481,7 +482,7 @@ startMessagesListener();
     console.log("ルーム参加完了");
     
 startMessagesListener();
-
+startIncomingCallListener();
   })
   .catch((error) => {
     console.error("ルーム初期化エラー:", error);
