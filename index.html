@@ -152,7 +152,15 @@ function startVoiceInput() {
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js";
 
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
+import {
+  getFirestore,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
 
   import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js";
 
@@ -182,6 +190,24 @@ signInAnonymously(auth)
   .catch((error) => {
     console.error("匿名ログイン失敗:", error);
   });
+
+async function saveMessage(text) {
+  if (!auth.currentUser) {
+    console.error("ログインが完了していません");
+    return;
+  }
+
+  try {
+    await addDoc(collection(db, "messages"), {
+      text: text,
+      uid: auth.currentUser.uid,
+      createdAt: serverTimestamp()
+    });
+    console.log("メッセージ保存成功");
+  } catch (error) {
+    console.error("メッセージ保存失敗:", error);
+  }
+}
 
 </script>
 </body>
