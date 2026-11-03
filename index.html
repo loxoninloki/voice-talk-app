@@ -232,6 +232,24 @@ const roomId = new URLSearchParams(
 console.log("現在のルームID:", roomId);
 
 const currentUserId = () => auth.currentUser?.uid ?? null;
+
+if (roomId) {
+  const messagesQuery = query(
+    collection(db, "rooms", roomId, "messages"),
+    orderBy("createdAt", "asc")
+  );
+
+  onSnapshot(messagesQuery, (snapshot) => {
+    console.log("受信したメッセージ数:", snapshot.size);
+    snapshot.forEach((doc) => {
+      console.log("受信:", doc.data().text);
+    });
+  }, (error) => {
+    console.error("受信エラー:", error);
+    alert("受信エラー: " + error.code);
+  });
+}
+
 </script>
 
 
