@@ -637,7 +637,20 @@ await updateDoc(callRef, {
 
 window.answerCall = answerCall;
 
-function endCall() {
+
+async function endCall() {
+  if (activeCallId && roomId) {
+    try {
+      const callRef = doc(db, "rooms", roomId, "calls", activeCallId);
+      await updateDoc(callRef, {
+        status: "ended",
+        endedAt: serverTimestamp()
+      });
+    } catch (error) {
+      console.error("通話終了通知エラー:", error);
+    }
+  }
+
   if (peerConnection) {
     peerConnection.close();
     peerConnection = null;
