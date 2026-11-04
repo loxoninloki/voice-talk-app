@@ -574,15 +574,17 @@ await applyPendingIceCandidates(pc);
     const answer = await pc.createAnswer();
 
 
-    await updateDoc(callRef, {
-      answer: {
-        type: answer.type,
-        sdp: answer.sdp
-      },
-      answererId: auth.currentUser.uid
-    });
-
+    
 await pc.setLocalDescription(answer);
+
+await updateDoc(callRef, {
+  answer: {
+    type: answer.type,
+    sdp: answer.sdp
+  },
+  answererId: auth.currentUser.uid
+});
+
 
     document.getElementById("callStatus").textContent =
       "応答データ保存完了（接続準備中）";
