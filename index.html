@@ -368,6 +368,52 @@ function setupIceCandidateSender(pc, callRef, role) {
   };
 }
 
+function setupIceCandidateReceiver(pc, callRef, role) {
+  const collectionName =
+    role === "caller"
+      ? "answerCandidates"
+      : "offerCandidates";
+
+  const candidatesRef = collection(
+    callRef,
+    collectionName
+  );
+
+  return onSnapshot(candidatesRef, (snapshot) => {
+    snapshot.docChanges().forEach(async (change) => {
+      if (change.type !== "added") return;
+
+      try {
+        const candidate = new RTCIceCandidate(
+          change.doc.data()
+        );
+
+        if (pc.remoteDescription) {
+          await pc.addIceCandidate(candidate);
+        } else {
+          if (!pc.pendingIceCandidates) {
+            pc.pendingIceCandidates = [];
+          }
+
+          pc.pendingIceCandidates.push(candidate);
+        }
+      } catch (error) {
+        console.error("ICE候補受信エラー:", error);
+      }
+    });
+  });
+}
+
+async function applyPendingIceCandidates(pc) {
+  const candidates = pc.pendingIceCandidates || [];
+
+  for (const candidate of candidates) {
+    await pc.addIceCandidate(candidate);
+  }
+
+  pc.pendingIceCandidates = [];
+}
+
 
 async function startCall() {
   if (!auth.currentUser || !roomId) {
