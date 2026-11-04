@@ -947,30 +947,7 @@ document.getElementById("callStatus").textContent = "Firebase受信：" + new Da
 
 
 
-       const box = document.getElementById("messages");
-    box.replaceChildren();
-
-    
-snapshot.docs.slice().reverse().forEach((doc) => {
-
-      const data = doc.data();
-      const item = document.createElement("div");
-
-      item.className = "message";
-      item.textContent = data.text || "";
-
-      if (data.uid === currentUserId()) {
-        item.style.marginLeft = "20%";
-        item.style.background = "#d9c8fa";
-      } else {
-        item.style.marginRight = "20%";
-        item.style.background = "#eeeeee";
-      }
-
-      box.appendChild(item);
-    });
-
-    box.scrollTop = box.scrollHeight;
+      
 
     if (!firstLoad) {
       snapshot.docChanges().forEach((change) => {
