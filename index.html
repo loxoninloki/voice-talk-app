@@ -636,6 +636,20 @@ await updateDoc(callRef, {
   answererId: auth.currentUser.uid
 });
 
+onSnapshot(callRef, (snapshot) => {
+  if (snapshot.data()?.status === "ended") {
+    if (peerConnection) {
+      peerConnection.close();
+      peerConnection = null;
+    }
+
+    document.getElementById("callStatus").textContent =
+      "相手が通話を終了しました";
+
+    document.getElementById("endCallButton").disabled = true;
+  }
+});
+
 
     document.getElementById("callStatus").textContent =
       "応答データ保存完了（接続準備中）";
