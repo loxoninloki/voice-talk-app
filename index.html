@@ -206,9 +206,7 @@ function speak(message) {
     return;
   }
 
-  if (navigator.audioSession) {
-  navigator.audioSession.type = "play-and-record";
-}
+  
 
 speechSynthesis.cancel();
 
