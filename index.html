@@ -274,7 +274,11 @@ function startVoiceInput() {
 
 <script>
 window.addEventListener("error", function(event) {
+  if (event.message !== "Script error.") {
   alert("起動エラー: " + event.message);
+} else {
+  console.warn("詳細不明のスクリプトエラー:", event);
+}
 });
 
 window.addEventListener("unhandledrejection", function(event) {
