@@ -144,12 +144,13 @@ async function toggleCallMic() {
 }
 
 async function recoverCallMic() {
-  if (!callStream || !peerConnection) return;
+  const pc = window.getPeerConnection?.();
+if (!callStream || !pc) return;
 
   const oldTrack = callStream.getAudioTracks()[0];
   if (!oldTrack || !oldTrack.muted) return;
 
-  const sender = peerConnection.getSenders()
+  const sender = pc.getSenders()
     .find(s => s.track?.kind === "audio");
 
   if (!sender) return;
@@ -407,8 +408,8 @@ const rtcConfig = {
     }
   ]
 };
-
 let peerConnection = null;
+window.getPeerConnection = () => peerConnection;
 let remoteAudioStream = null;
 
 function createPeerConnection() {
