@@ -953,7 +953,9 @@ box.scrollTop = box.scrollHeight;
 
 
   
-onSnapshot(messagesQuery, { includeMetadataChanges: true }, (snapshot) => {
+
+const stopRealtimeTest = () => onSnapshot(messagesQuery, { includeMetadataChanges: true }, (snapshot) => {
+
 
  
 
