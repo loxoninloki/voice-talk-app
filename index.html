@@ -914,7 +914,9 @@ const snapshot = await getDocsFromServer(messagesQuery);
 
     
 
-document.getElementById("incomingCallStatus").textContent = "定期取得：" + new Date().toLocaleTimeString() + " / 最新：" + (snapshot.docs[0]?.data().text || "なし").slice(0, 20);
+
+document.getElementById("incomingCallStatus").textContent = "取得時間：" + ((performance.now() - fetchStartTime) / 1000).toFixed(1) + "秒 / 最新：" + (snapshot.docs[0]?.data().text || "なし").slice(0, 20);
+
 
 
 const box = document.getElementById("messages");
