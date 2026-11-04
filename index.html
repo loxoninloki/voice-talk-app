@@ -301,7 +301,7 @@ window.addEventListener("unhandledrejection", function(event) {
 
 import {
   
-initializeFirestore,
+getFirestore,
 
   collection,
   addDoc,
@@ -334,9 +334,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const db = initializeFirestore(app, {
-  experimentalAutoDetectLongPolling: true
-});
+const db = getFirestore(app);
 
 const auth = getAuth(app);
 
