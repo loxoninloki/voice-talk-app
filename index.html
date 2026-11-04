@@ -453,7 +453,7 @@ async function startCall() {
       collection(db, "rooms", roomId, "calls")
     );
 
-setupIceCandidateSender(pc, callRef, "caller");
+
 
 setupIceCandidateReceiver(pc, callRef, "caller");
 
@@ -466,6 +466,9 @@ setupIceCandidateReceiver(pc, callRef, "caller");
         type: offer.type,
         sdp: offer.sdp
       },
+      
+setupIceCandidateSender(pc, callRef, "caller");
+
       createdAt: serverTimestamp()
     });
 
