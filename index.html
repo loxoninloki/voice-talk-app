@@ -320,10 +320,20 @@ let remoteAudioStream = null;
 function createPeerConnection() {
   peerConnection = new RTCPeerConnection(rtcConfig);
 
-  peerConnection.ontrack = (event) => {
-    remoteAudioStream = event.streams[0];
-    console.log("相手の音声を受信しました");
-  };
+  
+peerConnection.ontrack = (event) => {
+  remoteAudioStream = event.streams[0];
+
+  const audio = document.getElementById("remoteAudio");
+  audio.srcObject = remoteAudioStream;
+
+  audio.play().catch((error) => {
+    console.log("音声の自動再生待ち:", error);
+  });
+
+  console.log("相手の音声を受信しました");
+};
+
 
   peerConnection.onconnectionstatechange = () => {
     console.log(
