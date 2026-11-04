@@ -337,12 +337,25 @@ peerConnection.ontrack = (event) => {
 };
 
 
-  peerConnection.onconnectionstatechange = () => {
-    console.log(
-      "通話接続状態:",
-      peerConnection.connectionState
-    );
+  
+peerConnection.onconnectionstatechange = () => {
+  const state = peerConnection.connectionState;
+
+  console.log("通話接続状態:", state);
+
+  const labels = {
+    new: "接続準備中",
+    connecting: "接続中…",
+    connected: "通話接続成功",
+    disconnected: "接続が途切れました",
+    failed: "接続失敗",
+    closed: "通話終了"
   };
+
+  document.getElementById("callStatus").textContent =
+    labels[state] || "接続状態：" + state;
+};
+
 
   return peerConnection;
 }
