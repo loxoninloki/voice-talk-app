@@ -474,14 +474,12 @@ setupIceCandidateReceiver(pc, callRef, "caller");
 
 
     
+
 await setDoc(callRef, {
   callerId: auth.currentUser.uid,
-  offer: {
-    type: offer.type,
-    sdp: offer.sdp
-  },
   createdAt: serverTimestamp()
 });
+
 
 setupIceCandidateSender(pc, callRef, "caller");
 
