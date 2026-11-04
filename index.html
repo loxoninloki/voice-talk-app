@@ -909,6 +909,7 @@ setInterval(async () => {
   try {
 
     
+const fetchStartTime = performance.now();
 const snapshot = await getDocsFromServer(messagesQuery);
 
     
