@@ -861,10 +861,10 @@ await addDoc(
   collection(db, "rooms", roomId, "messages"),
   {
   
+
 text: text,
 uid: auth.currentUser.uid,
-createdAt: serverTimestamp(),
-clientSentAt: Date.now()
+createdAt: serverTimestamp()
 
   }
 );
