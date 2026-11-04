@@ -902,8 +902,12 @@ const messagesQuery = query(
   
 let firstLoad = true;
 let isFetchingMessages = false;
+
 setInterval(async () => {
+  if (isFetchingMessages) return;
+  isFetchingMessages = true;
   try {
+
     
 const snapshot = await getDocsFromServer(messagesQuery);
 
