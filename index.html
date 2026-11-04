@@ -903,7 +903,9 @@ const messagesQuery = query(
 setInterval(async () => {
   try {
     const snapshot = await getDocs(messagesQuery);
-    console.log("定期取得成功:", snapshot.size);
+    
+document.getElementById("incomingCallStatus").textContent = "定期取得：" + new Date().toLocaleTimeString() + " / " + snapshot.size + "件";
+
   } catch (error) {
     console.error("定期取得エラー:", error);
   }
