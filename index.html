@@ -942,9 +942,12 @@ if (firstLoad) {
 
   newMessages.forEach(doc => {
     const data = doc.data();
-    if (data.uid !== currentUserId() && data.text) {
-      speak(data.text);
-    }
+    
+if (data.uid !== currentUserId() && data.text) {
+  console.log("読み上げ実行:", data.text);
+  speak(data.text);
+}
+
   });
 }
 
