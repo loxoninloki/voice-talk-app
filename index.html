@@ -508,6 +508,8 @@ setupIceCandidateReceiver(pc, callRef, "answerer");
       new RTCSessionDescription(callData.offer)
     );
 
+await applyPendingIceCandidates(pc);
+
     const answer = await pc.createAnswer();
     await pc.setLocalDescription(answer);
 
