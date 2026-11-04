@@ -859,7 +859,9 @@ await addDoc(
   }
 );
     
-console.log("メッセージ保存成功");
+
+document.getElementById("incomingCallStatus").textContent = "Firebase保存完了：" + new Date().toLocaleTimeString();
+
 
 
   } catch (error) {
