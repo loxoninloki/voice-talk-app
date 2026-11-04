@@ -908,7 +908,9 @@ setInterval(async () => {
 const snapshot = await getDocsFromServer(messagesQuery);
 
     
-document.getElementById("incomingCallStatus").textContent = "定期取得：" + new Date().toLocaleTimeString() + " / " + snapshot.size + "件";
+
+document.getElementById("incomingCallStatus").textContent = "定期取得：" + new Date().toLocaleTimeString() + " / 最新：" + (snapshot.docs[0]?.data().text || "なし").slice(0, 20);
+
 
 const box = document.getElementById("messages");
 box.replaceChildren();
