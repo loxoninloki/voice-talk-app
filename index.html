@@ -893,7 +893,9 @@ const messagesQuery = query(
  
 
 
-document.getElementById("callStatus").textContent = "Firebase最終受信：" + new Date().toLocaleTimeString();
+
+document.getElementById("callStatus").textContent = "Firebase受信：" + new Date().toLocaleTimeString() + (snapshot.metadata.fromCache ? "（キャッシュ）" : "（サーバー）");
+
 
 
 
