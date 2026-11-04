@@ -900,6 +900,15 @@ const messagesQuery = query(
   
   let firstLoad = true;
 
+setInterval(async () => {
+  try {
+    const snapshot = await getDocs(messagesQuery);
+    console.log("定期取得成功:", snapshot.size);
+  } catch (error) {
+    console.error("定期取得エラー:", error);
+  }
+}, 5000);
+
   
 onSnapshot(messagesQuery, { includeMetadataChanges: true }, (snapshot) => {
 
