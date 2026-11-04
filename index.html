@@ -206,9 +206,13 @@ function speak(message) {
     return;
   }
 
-  speechSynthesis.cancel();
+  if (navigator.audioSession) {
+  navigator.audioSession.type = "play-and-record";
+}
 
-  const voice = new SpeechSynthesisUtterance(message);
+speechSynthesis.cancel();
+
+const voice = new SpeechSynthesisUtterance(message);
   voice.lang = "ja-JP";
   voice.rate = 0.9;
 
