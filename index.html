@@ -471,6 +471,8 @@ async function applyPendingIceCandidates(pc) {
 
 let unsubscribeCallAnswer = null;
 
+let activeCallId = null;
+
 async function startCall() {
   if (!auth.currentUser || !roomId) {
     alert("ルームへの接続が完了していません");
