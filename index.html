@@ -197,9 +197,12 @@ function enableVoice() {
   speechSynthesis.speak(test);
 }
 
+
 function speak(message) {
+  const status = document.getElementById("callStatus");
+
   if (!("speechSynthesis" in window)) {
-    alert("この端末では読み上げを利用できません");
+    status.textContent = "読み上げ非対応";
     return;
   }
 
@@ -220,8 +223,24 @@ function speak(message) {
 
   if (female) voice.voice = female;
 
+  voice.onstart = () => {
+    status.textContent = "🔊 読み上げ開始：" + message;
+  };
+
+  voice.onend = () => {
+    status.textContent = "✅ 読み上げ完了";
+  };
+
+  voice.onerror = (event) => {
+    status.textContent = "❌ 読み上げエラー：" + event.error;
+    console.error("読み上げエラー:", event.error);
+  };
+
+  status.textContent = "⏳ 読み上げ準備中：" + message;
+
   speechSynthesis.speak(voice);
 }
+
 
 function send() {
   const input = document.getElementById("text");
