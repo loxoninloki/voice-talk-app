@@ -87,6 +87,10 @@ button {
   着信待機中
 </p>
 
+<button id="answerCallButton" disabled>
+  📞 着信に応答（準備中）
+</button>
+
 
 <button onclick="enableVoice()">🔊 音声ON</button>
 
@@ -377,6 +381,8 @@ async function startCall() {
 window.startCall = startCall;
 
 
+let incomingCallId = null;
+
 let unsubscribeIncomingCalls = null;
 
 function startIncomingCallListener() {
@@ -407,12 +413,22 @@ function startIncomingCallListener() {
         );
       });
 
-      if (incoming) {
-        status.textContent = "📞 着信があります";
-        console.log("着信検知:", incoming.id);
-      } else {
-        status.textContent = "着信待機中";
-      }
+
+if (incoming) {
+  incomingCallId = incoming.id;
+
+  status.textContent = "📞 着信があります";
+
+  document.getElementById(
+    "answerCallButton"
+  ).textContent = "📞 着信に応答（準備中）";
+
+  console.log("着信検知:", incoming.id);
+} else {
+  incomingCallId = null;
+  status.textContent = "着信待機中";
+}
+
     },
     (error) => {
       console.error("着信監視エラー:", error);
