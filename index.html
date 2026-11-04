@@ -498,6 +498,8 @@ async function answerCall() {
 
 setupIceCandidateSender(pc, callRef, "answerer");
 
+setupIceCandidateReceiver(pc, callRef, "answerer");
+
     callStream.getTracks().forEach((track) => {
       pc.addTrack(track, callStream);
     });
