@@ -922,8 +922,14 @@ setInterval(async () => {
   try {
 
     
+
 const fetchStartTime = performance.now();
+
+document.getElementById("incomingCallStatus").textContent =
+  "取得開始：" + new Date().toLocaleTimeString() + " / 通信中";
+
 const snapshot = await getDocsFromServer(messagesQuery);
+
 
     
 
