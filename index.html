@@ -531,6 +531,19 @@ unsubscribeCallAnswer = onSnapshot(
   async (snapshot) => {
     const data = snapshot.data();
 
+if (data?.status === "ended") {
+  if (peerConnection) {
+    peerConnection.close();
+    peerConnection = null;
+  }
+
+  document.getElementById("callStatus").textContent =
+    "相手が通話を終了しました";
+
+  document.getElementById("endCallButton").disabled = true;
+  return;
+}
+
     if (!data?.answer || pc.remoteDescription) {
       return;
     }
