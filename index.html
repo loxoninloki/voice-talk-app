@@ -934,10 +934,14 @@ snapshot.docs.slice().reverse().forEach((doc) => {
 });
 box.scrollTop = box.scrollHeight;
 
-  } catch (error) {
-    console.error("定期取得エラー:", error);
-  }
+
+} catch (error) {
+  console.error("定期取得エラー:", error);
+} finally {
+  isFetchingMessages = false;
+}
 }, 5000);
+
 
   
 onSnapshot(messagesQuery, { includeMetadataChanges: true }, (snapshot) => {
