@@ -890,7 +890,10 @@ const messagesQuery = query(
   let firstLoad = true;
 
   onSnapshot(messagesQuery, (snapshot) => {
-    const box = document.getElementById("messages");
+ 
+console.log("Firebase受信:", new Date().toLocaleTimeString(), snapshot.size);
+
+       const box = document.getElementById("messages");
     box.replaceChildren();
 
     
