@@ -87,7 +87,9 @@ button {
   着信待機中
 </p>
 
-<button id="answerCallButton" disabled>
+
+<button id="answerCallButton" onclick="answerCall()" disabled>
+
   📞 着信に応答（準備中）
 </button>
 
@@ -276,6 +278,7 @@ import {
   serverTimestamp,
   doc,
   setDoc,
+  updateDoc,
   getDoc,
   runTransaction
 } from "https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js";
@@ -379,6 +382,68 @@ async function startCall() {
 }
 
 window.startCall = startCall;
+
+async function answerCall() {
+  if (!incomingCallId || !roomId) {
+    alert("応答する着信がありません");
+    return;
+  }
+
+  if (!callStream) {
+    alert("先に通話マイクをONにしてください");
+    return;
+  }
+
+  try {
+    const callRef = doc(
+      db, "rooms", roomId, "calls", incomingCallId
+    );
+
+    const callSnapshot = await getDoc(callRef);
+
+    if (!callSnapshot.exists()) {
+      throw new Error("通話が見つかりません");
+    }
+
+    const callData = callSnapshot.data();
+
+    if (!callData.offer || callData.answer) {
+      throw new Error("応答できない通話です");
+    }
+
+    const pc = createPeerConnection();
+
+    callStream.getTracks().forEach((track) => {
+      pc.addTrack(track, callStream);
+    });
+
+    await pc.setRemoteDescription(
+      new RTCSessionDescription(callData.offer)
+    );
+
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+
+    await updateDoc(callRef, {
+      answer: {
+        type: answer.type,
+        sdp: answer.sdp
+      },
+      answererId: auth.currentUser.uid
+    });
+
+    document.getElementById("callStatus").textContent =
+      "応答データ保存完了（接続準備中）";
+
+    console.log("通話応答を保存しました");
+
+  } catch (error) {
+    console.error("着信応答エラー:", error);
+    alert("着信応答エラー: " + error.message);
+  }
+}
+
+window.answerCall = answerCall;
 
 
 let incomingCallId = null;
