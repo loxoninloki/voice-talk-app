@@ -439,6 +439,8 @@ async function startCall() {
 
 setupIceCandidateSender(pc, callRef, "caller");
 
+setupIceCandidateReceiver(pc, callRef, "caller");
+
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
