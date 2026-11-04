@@ -616,9 +616,7 @@ setupIceCandidateSender(pc, callRef, "answerer");
 
 setupIceCandidateReceiver(pc, callRef, "answerer");
 
-    callStream.getTracks().forEach((track) => {
-      pc.addTrack(track, callStream);
-    });
+
 
     await pc.setRemoteDescription(
       new RTCSessionDescription(callData.offer)
