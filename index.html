@@ -904,7 +904,9 @@ const messagesQuery = query(
 
 setInterval(async () => {
   try {
-    const snapshot = await getDocs(messagesQuery);
+    
+const snapshot = await getDocsFromServer(messagesQuery);
+
     
 document.getElementById("incomingCallStatus").textContent = "定期取得：" + new Date().toLocaleTimeString() + " / " + snapshot.size + "件";
 
