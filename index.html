@@ -889,7 +889,9 @@ const messagesQuery = query(
   
   let firstLoad = true;
 
-  onSnapshot(messagesQuery, (snapshot) => {
+  
+onSnapshot(messagesQuery, { includeMetadataChanges: true }, (snapshot) => {
+
  
 
 
