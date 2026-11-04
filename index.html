@@ -237,7 +237,7 @@ function send() {
 
 
 if (typeof window.saveMessageToFirebase === "function") {
-  alert("Firebase保存処理を開始します");
+  
   window.saveMessageToFirebase(message);
 } else {
   alert("Firebase保存機能が読み込まれていません");
@@ -784,7 +784,7 @@ await addDoc(
 );
     
 console.log("メッセージ保存成功");
-alert("Firebaseへの保存に成功しました");
+
 
   } catch (error) {
     console.error("メッセージ保存失敗:", error);
