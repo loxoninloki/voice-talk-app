@@ -590,10 +590,6 @@ async function answerCall() {
     return;
   }
 
-  if (!callStream) {
-    alert("先に通話マイクをONにしてください");
-    return;
-  }
 
   try {
     const callRef = doc(
