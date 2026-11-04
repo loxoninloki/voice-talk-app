@@ -366,7 +366,11 @@ peerConnection.ontrack = (event) => {
 
   
 peerConnection.onconnectionstatechange = () => {
-  const state = peerConnection.connectionState;
+  const state 
+if (state === "connected") {
+  document.getElementById("endCallButton").disabled = false;
+}
+= peerConnection.connectionState;
 
   console.log("通話接続状態:", state);
 
