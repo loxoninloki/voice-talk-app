@@ -610,11 +610,19 @@ function startIncomingCallListener() {
       const incoming = snapshot.docs.find((callDoc) => {
         const data = callDoc.data();
 
-        return (
-          data.callerId !== auth.currentUser.uid &&
-          data.offer &&
-          !data.answer
-        );
+        
+const createdAt = data.createdAt?.toMillis?.();
+const isRecent =
+  createdAt &&
+  Date.now() - createdAt < 5 * 60 * 1000;
+
+return (
+  data.callerId !== auth.currentUser.uid &&
+  data.offer &&
+  !data.answer &&
+  isRecent
+);
+
       });
 
 
