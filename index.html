@@ -893,7 +893,9 @@ const messagesQuery = query(
     const box = document.getElementById("messages");
     box.replaceChildren();
 
-    snapshot.forEach((doc) => {
+    
+snapshot.docs.slice().reverse().forEach((doc) => {
+
       const data = doc.data();
       const item = document.createElement("div");
 
