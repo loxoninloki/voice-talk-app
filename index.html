@@ -457,6 +457,32 @@ setupIceCandidateReceiver(pc, callRef, "caller");
 
     console.log("通話接続要求を保存:", callRef.id);
 
+unsubscribeCallAnswer = onSnapshot(
+  callRef,
+  async (snapshot) => {
+    const data = snapshot.data();
+
+    if (!data?.answer || pc.remoteDescription) {
+      return;
+    }
+
+    try {
+      await pc.setRemoteDescription(
+        new RTCSessionDescription(data.answer)
+      );
+
+      await applyPendingIceCandidates(pc);
+
+      document.getElementById("callStatus").textContent =
+        "相手の応答を受信しました（接続中）";
+
+      console.log("相手の応答を受信しました");
+    } catch (error) {
+      console.error("応答受信エラー:", error);
+    }
+  }
+);
+
     document.getElementById("callStatus").textContent =
       "発信準備完了（相手の応答待ち）";
 
