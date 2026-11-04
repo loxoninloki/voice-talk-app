@@ -458,7 +458,7 @@ async function startCall() {
 setupIceCandidateReceiver(pc, callRef, "caller");
 
     const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
+
 
     
 await setDoc(callRef, {
@@ -471,6 +471,8 @@ await setDoc(callRef, {
 });
 
 setupIceCandidateSender(pc, callRef, "caller");
+
+await pc.setLocalDescription(offer);
 
 
     console.log("通話接続要求を保存:", callRef.id);
