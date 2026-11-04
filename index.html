@@ -629,6 +629,20 @@ await updateDoc(callRef, {
 
 window.answerCall = answerCall;
 
+function endCall() {
+  if (peerConnection) {
+    peerConnection.close();
+    peerConnection = null;
+  }
+
+  document.getElementById("callStatus").textContent =
+    "通話終了";
+
+  document.getElementById("endCallButton").disabled = true;
+}
+
+window.endCall = endCall;
+
 
 let incomingCallId = null;
 
