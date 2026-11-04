@@ -367,7 +367,10 @@ peerConnection.ontrack = (event) => {
   
 
 peerConnection.onconnectionstatechange = () => {
-  const state = peerConnection.connectionState;
+  
+if (!peerConnection) return;
+const state = peerConnection.connectionState;
+
 
   if (state === "connected") {
     document.getElementById("endCallButton").disabled = false;
