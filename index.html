@@ -892,7 +892,9 @@ const messagesQuery = query(
   onSnapshot(messagesQuery, (snapshot) => {
  
 
-document.getElementById("callStatus").dataset.firebaseReceived = new Date().toLocaleTimeString();
+
+document.getElementById("callStatus").textContent = "Firebase最終受信：" + new Date().toLocaleTimeString();
+
 
 
        const box = document.getElementById("messages");
