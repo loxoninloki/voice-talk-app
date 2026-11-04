@@ -221,7 +221,7 @@ function speak(message) {
     /Kyoko|Otoya|Siri|女性/i.test(v.name)
   );
 
-  if (female) voice.voice = female;
+  // if (female) voice.voice = female;
 
   voice.onstart = () => {
     status.textContent = "🔊 読み上げ開始：" + message;
