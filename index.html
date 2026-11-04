@@ -585,6 +585,9 @@ if (data?.status === "ended") {
 window.startCall = startCall;
 
 async function answerCall() {
+  
+alert("着信応答処理を開始しました");
+
   if (!incomingCallId || !roomId) {
     alert("応答する着信がありません");
     return;
