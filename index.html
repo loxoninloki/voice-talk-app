@@ -460,17 +460,18 @@ setupIceCandidateReceiver(pc, callRef, "caller");
     const offer = await pc.createOffer();
     await pc.setLocalDescription(offer);
 
-    await setDoc(callRef, {
-      callerId: auth.currentUser.uid,
-      offer: {
-        type: offer.type,
-        sdp: offer.sdp
-      },
-      
+    
+await setDoc(callRef, {
+  callerId: auth.currentUser.uid,
+  offer: {
+    type: offer.type,
+    sdp: offer.sdp
+  },
+  createdAt: serverTimestamp()
+});
+
 setupIceCandidateSender(pc, callRef, "caller");
 
-      createdAt: serverTimestamp()
-    });
 
     console.log("通話接続要求を保存:", callRef.id);
 
