@@ -485,6 +485,13 @@ setupIceCandidateSender(pc, callRef, "caller");
 
 await pc.setLocalDescription(offer);
 
+await updateDoc(callRef, {
+  offer: {
+    type: offer.type,
+    sdp: offer.sdp
+  }
+});
+
 
     console.log("通話接続要求を保存:", callRef.id);
 
