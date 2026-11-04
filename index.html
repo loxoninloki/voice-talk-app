@@ -143,6 +143,35 @@ async function toggleCallMic() {
   }
 }
 
+async function recoverCallMic() {
+  if (!callStream || !peerConnection) return;
+
+  const oldTrack = callStream.getAudioTracks()[0];
+  if (!oldTrack || !oldTrack.muted) return;
+
+  const sender = peerConnection.getSenders()
+    .find(s => s.track?.kind === "audio");
+
+  if (!sender) return;
+
+  try {
+    const newStream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false
+    });
+
+    const newTrack = newStream.getAudioTracks()[0];
+    await sender.replaceTrack(newTrack);
+
+    callStream.getTracks().forEach(t => t.stop());
+    callStream = newStream;
+
+    console.log("マイク再接続成功");
+  } catch (error) {
+    console.error("マイク再接続失敗:", error);
+  }
+}
+
 
 function createNewRoom() {
   const confirmed = confirm(
@@ -230,8 +259,9 @@ const voice = new SpeechSynthesisUtterance(message);
   };
 
   voice.onend = () => {
-    status.textContent = "✅ 読み上げ完了";
-  };
+  status.textContent = "✅ 読み上げ完了";
+  recoverCallMic();
+};
 
   voice.onerror = (event) => {
     status.textContent = "❌ 読み上げエラー：" + event.error;
