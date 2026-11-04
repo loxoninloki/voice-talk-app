@@ -559,7 +559,7 @@ setupIceCandidateReceiver(pc, callRef, "answerer");
 await applyPendingIceCandidates(pc);
 
     const answer = await pc.createAnswer();
-    await pc.setLocalDescription(answer);
+
 
     await updateDoc(callRef, {
       answer: {
@@ -568,6 +568,8 @@ await applyPendingIceCandidates(pc);
       },
       answererId: auth.currentUser.uid
     });
+
+await pc.setLocalDescription(answer);
 
     document.getElementById("callStatus").textContent =
       "応答データ保存完了（接続準備中）";
