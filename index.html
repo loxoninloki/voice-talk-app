@@ -579,6 +579,8 @@ async function answerCall() {
       db, "rooms", roomId, "calls", incomingCallId
     );
 
+activeCallId = callRef.id;
+
     const callSnapshot = await getDoc(callRef);
 
     if (!callSnapshot.exists()) {
