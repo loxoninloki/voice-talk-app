@@ -894,11 +894,12 @@ const currentUserId = () => auth.currentUser?.uid ?? null;
 function startMessagesListener() {
   if (!roomId) return;
   
+
 const messagesQuery = query(
   collection(db, "rooms", roomId, "messages"),
-  orderBy("createdAt", "desc"),
   limit(50)
 );
+
 
 
   
