@@ -885,15 +885,19 @@ if (members.length >= 4) {
   throw new Error("このルームは満員です");
 }
 
+
 transaction.update(roomRef, {
   members: [...members, uid]
 });
 
+// runTransactionを閉じる（抜けていた部分）
+});
 
-    console.log("ルーム参加完了");
-    
+console.log("ルーム参加完了");
+
 startMessagesListener();
 startIncomingCallListener();
+
   })
   .catch((error) => {
     console.error("ルーム初期化エラー:", error);
