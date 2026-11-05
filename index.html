@@ -875,18 +875,20 @@ startIncomingCallListener();
         throw new Error("ルームが見つかりません");
       }
 
-      const members = roomSnapshot.data().members || [];
+      
+const members = roomSnapshot.data().members || [];
 
-      if (members.includes(uid)) return;
+if (members.includes(uid)) return;
 
-      if (members.length >= 2) {
-        throw new Error("このルームは満員です");
-      }
+// members が3人までは、新しい参加者を拒否しない
+if (members.length >= 4) {
+  throw new Error("このルームは満員です");
+}
 
-      transaction.update(roomRef, {
-        members: [...members, uid]
-      });
-    });
+transaction.update(roomRef, {
+  members: [...members, uid]
+});
+
 
     console.log("ルーム参加完了");
     
