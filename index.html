@@ -174,39 +174,24 @@ if (!callStream || !pc) return;
 }
 
 
-function createNewRoom() {
-  const confirmed = confirm(
-    "新しい会話ルームを作成しますか？\n現在のルームから移動します。"
-  );
-
-  if (!confirmed) return;
-
-  const roomId = crypto.randomUUID();
-  
-sessionStorage.setItem("room-creator-" + roomId, "pending");
-
-  const url = new URL(window.location.href);
-
-  url.search = "";
-  url.searchParams.set("room", roomId);
-
-  window.location.href = url.toString();
+async function createNewRoom() {
+  if (!confirm("新しい会話ルームを作成しますか？\n現在のルームから移動します。")) return;
+  if (typeof window.createFirebaseRoom !== "function") {
+    alert("Firebaseの準備中です。少し待ってからお試しください。");
+    return;
+  }
+  await window.createFirebaseRoom();
 }
 
 function copyInviteURL() {
-  const url = new URL(window.location.href);
-
-  if (!url.searchParams.get("room")) {
-    url.searchParams.set("room", crypto.randomUUID());
+  if (!window.roomReady) {
+    alert("ルームへの接続完了後に招待URLをコピーしてください。");
+    return;
   }
-
+  const url = new URL(window.location.href);
   navigator.clipboard.writeText(url.toString())
-    .then(() => {
-      alert("招待URLをコピーしました！");
-    })
-    .catch(() => {
-      prompt("このURLをコピーしてください", url.toString());
-    });
+    .then(() => alert("招待URLをコピーしました！"))
+    .catch(() => prompt("このURLをコピーしてください", url.toString()));
 }
 
 let voiceEnabled = false;
@@ -548,7 +533,7 @@ let unsubscribeCallAnswer = null;
 let activeCallId = null;
 
 async function startCall() {
-  if (!auth.currentUser || !roomId) {
+  if (!window.roomReady || !auth.currentUser || !roomId) {
     alert("ルームへの接続が完了していません");
     return;
   }
@@ -654,7 +639,7 @@ async function answerCall() {
   
 alert("着信応答処理を開始しました");
 
-  if (!incomingCallId || !roomId) {
+  if (!window.roomReady || !incomingCallId || !roomId) {
     alert("応答する着信がありません");
     return;
   }
@@ -832,83 +817,160 @@ document.getElementById(
   );
 }
 
-signInAnonymously(auth)
-  .then(async (result) => {
-    const uid = result.user.uid;
-    console.log("匿名ログイン成功:", uid);
+// A single promise prevents startup and the create button from signing in twice.
+let authReadyPromise = null;
+window.roomReady = false;
 
-    const newRoomId = new URLSearchParams(
-      window.location.search
-    ).get("room");
-
-   
-if (!newRoomId) return;
-
-if (newRoomId === "test-room") {
-  startMessagesListener();
-  startIncomingCallListener();
-  return;
+function roomError(code, message) {
+  return Object.assign(new Error(message), { code });
 }
 
-    const roomRef = doc(db, "rooms", newRoomId);
-    const creatorKey = "room-creator-" + newRoomId;
+function diagnostic(event, context, error) {
+  // Never serialize Firebase errors, room data, UIDs or tokens.
+  // Only known SDK messages are retained; arbitrary messages may contain IDs.
+  const messages = {
+    "permission-denied": "Missing or insufficient permissions.",
+    "unavailable": "The service is currently unavailable.",
+    "unauthenticated": "Authentication is required."
+  };
+  const entry = {
+    event,
+    operation: context.operation,
+    role: context.role,
+    memberCount: context.memberCount ?? null,
+    authenticated: Boolean(auth.currentUser?.uid),
+    code: error?.code || null,
+    message: error ? (messages[error.code] || "処理に失敗しました（詳細はコードを確認してください）") : null
+  };
+  console.info("[room]", entry);
+}
 
-    if (sessionStorage.getItem(creatorKey) === "pending") {
-      await setDoc(roomRef, {
-        ownerId: uid,
-        members: [uid],
+function reportRoomError(error, context) {
+  const events = {
+    "permission-denied": "ROOM_ACCESS_DENIED",
+    "room/full": "ROOM_FULL",
+    "room/not-found": "ROOM_NOT_FOUND"
+  };
+  diagnostic(events[error.code] || context.operation + "_FAILED", context, error);
+  const messages = {
+    "permission-denied": "ルームへのアクセスが許可されませんでした。取得権限と更新権限を確認してください。",
+    "room/full": "このルームは満員です。",
+    "room/not-found": "ルームが見つかりません。",
+    "room/invalid": "ルームの登録情報に不整合があります。",
+    "room/exists": "同じIDのルームが既に存在します。新しく作成してください。",
+    "auth/missing-uid": "認証情報を取得できませんでした。"
+  };
+  const code = /^[a-z0-9/-]+$/i.test(error.code || "") ? error.code : "unknown";
+  alert("ルーム処理に失敗しました。\n処理：" + context.operation +
+    "\nエラー：" + code + "\n" +
+    (messages[code] || "通信状態とFirebaseの設定を確認してください。"));
+}
+
+function ensureAnonymousUser(context) {
+  if (!authReadyPromise) {
+    authReadyPromise = (async () => {
+      context.operation = "AUTH";
+      diagnostic("AUTH_START", context);
+      await auth.authStateReady();
+      const user = auth.currentUser || (await signInAnonymously(auth)).user;
+      if (!user?.uid) throw roomError("auth/missing-uid", "認証UIDがありません");
+      diagnostic("AUTH_SUCCESS", context);
+      return user;
+    })().catch(error => {
+      authReadyPromise = null;
+      throw error;
+    });
+  }
+  return authReadyPromise;
+}
+
+let creatingRoom = false;
+window.createFirebaseRoom = async () => {
+  if (creatingRoom) return;
+  creatingRoom = true;
+  const context = { operation: "AUTH", role: "creator", memberCount: null };
+  try {
+    const newRoomId = crypto.randomUUID();
+    const user = await ensureAnonymousUser(context);
+    context.operation = "ROOM_CREATE";
+    diagnostic("ROOM_CREATE_START", context);
+    const roomRef = doc(db, "rooms", newRoomId);
+    // Reading inside the transaction prevents overwriting even on an ID collision.
+    await runTransaction(db, async transaction => {
+      const snapshot = await transaction.get(roomRef);
+      if (snapshot.exists()) throw roomError("room/exists", "ルームID重複");
+      transaction.set(roomRef, {
+        ownerId: user.uid,
+        members: [user.uid],
         createdAt: serverTimestamp()
       });
+    });
+    context.memberCount = 1;
+    diagnostic("ROOM_CREATE_SUCCESS", context);
+    const url = new URL(window.location.href);
+    url.search = "";
+    url.searchParams.set("room", newRoomId);
+    window.location.href = url.toString();
+  } catch (error) {
+    reportRoomError(error, context);
+  } finally {
+    creatingRoom = false;
+  }
+};
 
-      sessionStorage.removeItem(creatorKey);
-      console.log("ルーム作成完了");
-      
-startMessagesListener();
-startIncomingCallListener();
-      return;
+async function initializeRoom() {
+  const context = { operation: "AUTH", role: "participant", memberCount: null };
+  try {
+    const user = await ensureAnonymousUser(context);
+    const targetRoomId = new URLSearchParams(window.location.search).get("room");
+    if (!targetRoomId) return;
+    if (!/^[a-zA-Z0-9_-]{1,128}$/.test(targetRoomId)) {
+      throw roomError("room/invalid", "不正なルームID");
     }
-
-    await runTransaction(db, async (transaction) => {
-      const roomSnapshot = await transaction.get(roomRef);
-
-      if (!roomSnapshot.exists()) {
-        throw new Error("ルームが見つかりません");
+    const roomRef = doc(db, "rooms", targetRoomId);
+    await runTransaction(db, async transaction => {
+      context.operation = "ROOM_FETCH";
+      context.memberCount = null;
+      diagnostic("ROOM_FETCH_START", context);
+      const snapshot = await transaction.get(roomRef);
+      if (!snapshot.exists()) throw roomError("room/not-found", "ルームが見つかりません");
+      const data = snapshot.data();
+      const members = data.members;
+      context.memberCount = Array.isArray(members) ? members.length : null;
+      context.role = data.ownerId === user.uid ? "creator" : "participant";
+      diagnostic("ROOM_FETCH_SUCCESS", context);
+      if (!Array.isArray(members) || members.length < 1 ||
+          members.length > 2 || typeof data.ownerId !== "string" ||
+          !data.ownerId || members[0] !== data.ownerId ||
+          members.some(uid => typeof uid !== "string" || !uid) ||
+          new Set(members).size !== members.length) {
+        throw roomError("room/invalid", "ルーム情報の不整合");
       }
-
-      
-const members = roomSnapshot.data().members || [];
-
-if (members.includes(uid)) return;
-
-// members が3人までは、新しい参加者を拒否しない
-if (members.length >= 4) {
-  throw new Error("このルームは満員です");
+      context.operation = "ROOM_JOIN";
+      diagnostic("ROOM_JOIN_START", context);
+      if (members.includes(user.uid)) return;
+      if (members.length >= 2) throw roomError("room/full", "このルームは満員です");
+      transaction.update(roomRef, { members: [data.ownerId, user.uid] });
+    });
+    context.memberCount = context.memberCount === 1 && context.role !== "creator"
+      ? 2 : context.memberCount;
+    diagnostic("ROOM_JOIN_SUCCESS", context);
+    window.roomReady = true;
+    startMessagesListener();
+    startIncomingCallListener();
+  } catch (error) {
+    window.roomReady = false;
+    reportRoomError(error, context);
+  }
 }
 
-
-transaction.update(roomRef, {
-  members: [...members, uid]
-});
-
-// runTransactionを閉じる（抜けていた部分）
-});
-
-console.log("ルーム参加完了");
-
-startMessagesListener();
-startIncomingCallListener();
-
-  })
-  .catch((error) => {
-    console.error("ルーム初期化エラー:", error);
-    alert("ルーム初期化エラー: " + error.message);
-  });
-
+// Defer initialization until module declarations (including roomId) are ready.
+Promise.resolve().then(initializeRoom);
 
 
 async function saveMessage(text) {
-if (!roomId) {
-  alert("会話ルームが指定されていません");
+if (!window.roomReady || !roomId) {
+  alert("ルームへの接続が完了していません");
   return;
 }
     if (!auth.currentUser) {
@@ -1089,3 +1151,4 @@ document.getElementById("callStatus").textContent = "Firebase受信：" + new Da
 
 </body>
 </html>
+
