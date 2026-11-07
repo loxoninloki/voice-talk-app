@@ -5,113 +5,355 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>音声トーク</title>
 <style>
+:root {
+  color-scheme: light;
+  --ink: #403454;
+  --ink-soft: #796d8f;
+  --violet: #8b70cb;
+  --violet-deep: #7756b8;
+  --lavender: #f1e9fc;
+  --line: #e8def5;
+  --white: #fff;
+  --shadow: 0 8px 28px rgba(96, 69, 140, .09);
+}
 * { box-sizing: border-box; }
+html, body { margin: 0; width: 100%; min-height: 100%; }
 body {
-  margin: 0;
-  font-family: sans-serif;
-  background: #f6f2ff;
-  color: #333;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+  color: var(--ink);
+  background: #f8f4ff;
+  -webkit-font-smoothing: antialiased;
 }
-header {
-  background: #a58bd4;
-  color: white;
-  padding: 20px;
-  text-align: center;
+button, input { font: inherit; }
+button {
+  min-height: 44px;
+  border: 0;
+  border-radius: 14px;
+  font-weight: 700;
+  font-size: 13px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .14s, background .14s, opacity .14s;
+}
+button:active { transform: scale(.98); }
+button:focus-visible, input:focus-visible, summary:focus-visible {
+  outline: 3px solid #b49ae4;
+  outline-offset: 2px;
+}
+button:disabled { opacity: .5; cursor: not-allowed; }
+.app-shell {
+  height: 100vh;
+  height: 100dvh;
+  max-width: 760px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 98% 0%, #ebdcff 0, transparent 45%),
+    radial-gradient(circle at 0% 90%, #e8eafe 0, transparent 43%),
+    #f9f6ff;
+}
+.topbar {
+  padding: calc(12px + env(safe-area-inset-top, 0px)) 18px 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 15px;
+  flex-shrink: 0;
+  color: #fff;
   font-size: 22px;
+  background: linear-gradient(145deg, #bca2ef, #8667c6);
+  box-shadow: 0 5px 13px rgba(137, 105, 197, .22);
 }
-main {
-  padding: 16px;
-  max-width: 600px;
-  margin: auto;
+.brand-copy { min-width: 0; flex: 1; }
+.brand-copy h1 { font-size: 17px; margin: 0; letter-spacing: .02em; line-height: 1.3; }
+.brand-copy p { font-size: 10px; color: var(--ink-soft); margin: 3px 0 0; }
+.brand-heart { color: #b495df; font-size: 22px; }
+.app-main {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0 12px calc(9px + env(safe-area-inset-bottom, 0px));
 }
+.connection-panel, .chat-panel, .call-panel, .extras {
+  border: 1px solid rgba(222, 211, 241, .86);
+  background: rgba(255, 255, 255, .92);
+  box-shadow: var(--shadow);
+  border-radius: 20px;
+}
+.connection-panel { flex-shrink: 0; padding: 10px 14px; }
+.connection-top, .chat-heading, .panel-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.eyebrow, .panel-title {
+  color: var(--ink-soft);
+  font-weight: 750;
+  font-size: 11px;
+  letter-spacing: .04em;
+}
+.status-dot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ae96dc;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+.pill {
+  font-size: 10px;
+  font-weight: 750;
+  color: #8265b7;
+  background: #f2ebfc;
+  border-radius: 999px;
+  padding: 4px 10px;
+}
+#callStatus {
+  margin: 6px 0 2px;
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#incomingCallStatus {
+  margin: 0;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--ink-soft);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
+}
+.chat-heading {
+  padding: 11px 14px 9px;
+  flex-shrink: 0;
+}
+.chat-heading h2 {
+  margin: 0;
+  font-size: 13px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.chat-hint { color: var(--ink-soft); font-size: 10px; }
 #messages {
-  height: 55vh;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  background: white;
-  border-radius: 16px;
-  padding: 15px;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  padding: 12px;
+  background: linear-gradient(160deg, #faf8ff 0%, #fff 70%);
+  border-top: 1px solid #f0eaf8;
+  border-bottom: 1px solid #f0eaf8;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+#messages:empty::before {
+  content: "ここから会話が始まります ✨";
+  align-self: center;
+  margin: auto;
+  color: #a194b5;
+  font-size: 12px;
 }
 .message {
-  background: #eee5ff;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 12px;
+  display: block;
+  flex-shrink: 0;
+  max-width: 86%;
+  width: fit-content;
+  margin: 0;
+  padding: 9px 12px;
+  border-radius: 17px 17px 17px 5px;
+  background: #f0ebf7;
+  color: #493e58;
+  font-size: 13px;
+  line-height: 1.55;
   overflow-wrap: anywhere;
+  box-shadow: 0 2px 7px rgba(102, 79, 142, .06);
 }
+.message.mine {
+  align-self: flex-end;
+  background: #e5d7fa;
+  border-radius: 17px 17px 5px 17px;
+}
+.message.theirs { align-self: flex-start; }
 .controls {
   display: flex;
-  gap: 8px;
-  margin-top: 15px;
+  align-items: center;
+  gap: 7px;
+  padding: 9px;
+  flex-shrink: 0;
 }
-input {
+.controls input {
   flex: 1;
   min-width: 0;
-  padding: 14px;
-  border: 1px solid #ccc;
-  border-radius: 12px;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: #faf8ff;
   font-size: 16px;
+  color: var(--ink);
 }
-button {
-  background: #9876cf;
+.controls input::placeholder { color: #aaa0b8; }
+.icon-button {
+  flex: 0 0 44px;
+  width: 44px;
+  padding: 0;
+  font-size: 18px;
+  background: #f0e7fa;
+  color: var(--violet-deep);
+}
+.send-button {
+  padding: 0 16px;
+  flex-shrink: 0;
   color: white;
-  border: none;
-  border-radius: 12px;
-  padding: 14px;
-  font-size: 16px;
+  background: linear-gradient(135deg, #a68add, #8667c8);
+  box-shadow: 0 3px 8px rgba(126, 93, 179, .14);
+}
+.call-panel { padding: 10px; flex-shrink: 0; }
+.panel-title { margin: 0 2px 8px; }
+.panel-title span:last-child { font-weight: 500; font-size: 10px; letter-spacing: 0; }
+.prepare-actions, .connect-actions {
+  display: grid;
+  gap: 7px;
+}
+.prepare-actions { grid-template-columns: 1fr 1fr; margin-bottom: 7px; }
+.connect-actions { grid-template-columns: 1fr 1fr 1fr; }
+.soft-button { background: #f0e7fb; color: #7356af; }
+.mic-button {
+  color: #fff;
+  background: linear-gradient(135deg, #a58bdc, #8564c7);
+}
+.connect-button { color: white; background: #8b72ca; }
+.answer-button { color: #6c529e; background: #eae1f9; }
+.end-button { color: #9e637d; background: #faeaf1; }
+.extras {
+  padding: 0 12px;
+  flex-shrink: 0;
+  border-radius: 15px;
+  box-shadow: none;
+}
+.extras summary {
+  list-style: none;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: #73628c;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.extras summary::-webkit-details-marker { display: none; }
+.extras summary::after { content: "⌄"; font-size: 18px; color: #a48fc8; }
+.extras[open] summary::after { content: "⌃"; }
+.extras-content { display: flex; flex-wrap: wrap; gap: 7px; padding: 0 0 12px; }
+.extras-content button { flex: 1 1 45%; background: #f0e7fb; color: #7356af; }
+.extras-content p { width: 100%; margin: 2px 0 0; font-size: 10px; color: var(--ink-soft); }
+#remoteAudio { display: none; }
+@media (max-width: 370px) {
+  .app-main { gap: 7px; padding-inline: 9px; }
+  .call-panel { padding: 8px; }
+  button { font-size: 12px; }
+  .panel-title span:last-child { font-size: 9px; }
+  .brand-copy p { font-size: 9px; }
+}
+@media (max-height: 610px) {
+  body { overflow-y: auto; }
+  .app-shell { height: auto; min-height: 100dvh; overflow: visible; }
+  .app-main { min-height: 540px; }
+  #messages { min-height: 130px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  button { transition: none; }
 }
 </style>
 </head>
 <body>
+<div class="app-shell">
+  <header class="topbar">
+    <div class="brand-mark" aria-hidden="true">✦</div>
+    <div class="brand-copy">
+      <h1>音声トーク</h1>
+      <p>声でも、文字でも、つながれる</p>
+    </div>
+    <span class="brand-heart" aria-hidden="true">♡</span>
+  </header>
 
-<header>音声トーク</header>
+  <main class="app-main">
+    <section class="connection-panel" aria-label="接続状態">
+      <div class="connection-top">
+        <span class="eyebrow"><span class="status-dot"></span>いまの状態</span>
+        <span class="pill">ふたりの会話</span>
+      </div>
+      <p id="callStatus" role="status">通話マイク：OFF</p>
+      <p id="incomingCallStatus" aria-live="polite">着信待機中</p>
+    </section>
 
-<main>
-  <div id="messages"></div>
+    <section class="chat-panel" aria-label="チャット">
+      <div class="chat-heading">
+        <h2><span aria-hidden="true">💬</span> メッセージ</h2>
+        <span class="chat-hint">文字でやさしくお返事</span>
+      </div>
+      <div id="messages" role="log" aria-label="会話履歴"></div>
+      <div class="controls">
+        <input id="text" type="text" placeholder="メッセージを入力…" aria-label="メッセージを入力" autocomplete="off">
+        <button type="button" class="icon-button" onclick="startVoiceInput()" aria-label="音声入力">🎤</button>
+        <button type="button" class="send-button" onclick="send()">送信</button>
+      </div>
+    </section>
 
-  <div class="controls">
-    <input id="text" placeholder="メッセージを入力">
-    <button onclick="send()">送信</button>
-    <button onclick="startVoiceInput()">🎤</button>
-  </div>
-  
-<button id="callButton" onclick="toggleCallMic()">
-  📞 通話マイクON
-</button>
-<p id="callStatus">通話マイク：OFF</p>
+    <section class="call-panel" aria-label="通話操作">
+      <div class="panel-title">
+        <span>🎧 通話コントロール</span>
+        <span>音声の準備 → マイク → 通話</span>
+      </div>
+      <div class="prepare-actions">
+        <button type="button" class="soft-button" onclick="enableVoice()">🔊 読み上げON</button>
+        <button type="button" id="callButton" class="mic-button" onclick="toggleCallMic()">📞 通話マイクON</button>
+      </div>
+      <div class="connect-actions">
+        <button type="button" id="startCallButton" class="connect-button" onclick="startCall()">📞 通話開始</button>
+        <button type="button" id="answerCallButton" class="answer-button" onclick="answerCall()">📲 応答する</button>
+        <button type="button" id="endCallButton" class="end-button" onclick="endCall()">通話終了</button>
+      </div>
+      <audio id="remoteAudio" autoplay playsinline></audio>
+    </section>
 
-<audio id="remoteAudio" autoplay playsinline></audio>
-
-
-<button id="startCallButton" onclick="startCall()">
-  📞 通話開始
-</button>
-
-<p id="incomingCallStatus">
-  着信待機中
-</p>
-
-
-
-<button id="answerCallButton" onclick="answerCall()">
-
-  📞 着信に応答
-</button>
-
-
-<button id="endCallButton" onclick="endCall()">
-
-  📞 通話終了
-</button>
-
-
-<button onclick="enableVoice()">🔊 音声ON</button>
-
-<button onclick="copyInviteURL()">🔗 招待URLをコピー</button>
-
-<button onclick="createNewRoom()">＋ 新しいルームを作成</button>
-
-  <p>女性音声でメッセージを読み上げます。</p>
-</main>
+    <details class="extras">
+      <summary>⚙️ ルーム・招待の設定</summary>
+      <div class="extras-content">
+        <button type="button" onclick="copyInviteURL()">🔗 招待URLをコピー</button>
+        <button type="button" onclick="createNewRoom()">＋ 新しいルームを作成</button>
+        <p>相手の新着メッセージを音声で読み上げます。</p>
+      </div>
+    </details>
+  </main>
+</div>
 
 <script>
 
@@ -269,7 +511,7 @@ function send() {
   const box = document.getElementById("messages");
   const item = document.createElement("div");
 
-  item.className = "message";
+  item.className = "message mine";
   item.textContent = message;
 
   box.appendChild(item);
@@ -1087,15 +1329,10 @@ box.replaceChildren();
 snapshot.docs.slice().reverse().forEach((doc) => {
   const data = doc.data();
   const item = document.createElement("div");
-  item.className = "message";
+  item.className = data.uid === currentUserId()
+    ? "message mine"
+    : "message theirs";
   item.textContent = data.text || "";
-  if (data.uid === currentUserId()) {
-    item.style.marginLeft = "20%";
-    item.style.background = "#d9c8fa";
-  } else {
-    item.style.marginRight = "20%";
-    item.style.background = "#eeeeee";
-  }
   box.appendChild(item);
 });
 box.scrollTop = box.scrollHeight;
